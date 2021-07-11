@@ -1,2 +1,2 @@
 drop cache: echo 1 | sudo tee /proc/sys/vm/drop_caches
-block trace : sudo blktrace -d /dev/sda -o - | blkparse -f "%M %m %d %a %S %N %p\n" -i -
+block trace : sudo blktrace -d /dev/sda -a issue -a complete -o - | blkparse -f "%M %m %d %a %S %N %p\n" -i -
