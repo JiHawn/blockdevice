@@ -1,5 +1,0 @@
-#!/bin/bash
-for var in {1..33}
-do
-	fallocate -l 4k testfile_4k_$var
-done
