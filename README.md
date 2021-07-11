@@ -1,1 +1,2 @@
-# blockdevice
+# 국민대학교 임베디드시스템연구실 학부연구생
+readahead 실험 중.....
