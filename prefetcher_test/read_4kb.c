@@ -12,7 +12,7 @@ void main() {
     float start, end, result;
     struct dirent *ent;
     DIR *dir = opendir("./4kbs");
-    printf("%d\n", getpid());
+    // printf("%d\n", getpid());
     if (dir == NULL) {
         perror("failed openning directory");
         return;
@@ -40,5 +40,5 @@ void main() {
     }   
     end = clock();
     result = end - start;
-    printf("4KB x 32: Read success!\ntime: %lf\n", (double)result/CLOCKS_PER_SEC);
+    printf("%lf\n", (double)result/CLOCKS_PER_SEC);
 }

@@ -21,7 +21,7 @@ void main() {
     struct dirent *ent;
     DIR *dir;
 
-    printf("PID: %d\n", getpid());
+    // printf("PID: %d\n", getpid());
 
     wd = inotify_add_watch(ifd, target, IN_ACCESS);
 
