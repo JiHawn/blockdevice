@@ -53,11 +53,14 @@ void main() {
                             size = lseek(fd, 0, SEEK_END);
                             if(size <= 4096) {
                                 lseek(fd, 0, SEEK_SET);
-                                readahead(fd, 0, size);
+                                posix_fadvise(fd, 0, size, POSIX_FADV_WILLNEED);
+                                flag = CACHED;
+                                // readahead(fd, 0, size);
                             }
                             close(fd);
                         }
-                        flag = CACHED;
+                        printf("prefetch is done!\n");
+                        break;
                     }
                 }
             }
