@@ -22,9 +22,10 @@ void main() {
     buffer = malloc(1024*4);
     start = clock();
     while ((ent = readdir(dir)) != NULL) {
+        if(!strcmp(ent->d_name, ".") || !strcmp(ent->d_name, "..")) continue;
+        memset(buffer, 0, sizeof(buffer));
         char filepath[100] = "./4kbs/";
         strcat(filepath, ent->d_name);
-        // printf("%s\n", filepath);
         fp = fopen(filepath, "r");
         if(fp < 0) {
             perror("failed reading file");
@@ -35,6 +36,7 @@ void main() {
             perror("failed reading file");
             return;
         }
+        fclose(fp);
         // printf("file name: %s\n", filepath);
         // sleep(1);
     }   
