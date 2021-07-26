@@ -6,14 +6,27 @@
 #include <string.h>
 #include <fcntl.h>
 #include <stdlib.h>
+#include <time.h>
 
 
 #define EVENT_SIZE (sizeof(struct inotify_event))
 #define BUFF_SIZE (1024*(EVENT_SIZE + 16))
 
+double get_time() {
+    double ms;
+    int s;
+    struct timespec spec;
+
+    clock_gettime(CLOCK_REALTIME, &spec);
+    s = spec.tv_sec;
+    ms = spec.tv_nsec / 10e8;
+    return s + ms;
+}
+
 void main(int argc, char* argv[]) {
     int fd, ifd = inotify_init();
     int wd, rc ,size;
+    double start, timestamp1, timestamp2;
     char buffer[BUFF_SIZE];
     char target[20];
     struct dirent *ent;
@@ -23,10 +36,8 @@ void main(int argc, char* argv[]) {
     if(argc == 1) {
         printf("input directory name!\n");
     }
-
+    strcat(argv[1], "kb/");
     strcat(target, argv[1]);
-    strcat(target, "/");
-    printf("%s\n", target);
     // printf("PID: %d\n", getpid());
 
     wd = inotify_add_watch(ifd, target, IN_ACCESS);
@@ -48,6 +59,7 @@ void main(int argc, char* argv[]) {
                         inotify_rm_watch(ifd, wd);
                         return;
                     }
+                    // start = clock();
                     while((ent = readdir(dir)) != NULL) {
                             if(!strncmp(ent->d_name, ".", 1)) continue;
                             char *targetfile = malloc(sizeof(char) * 30);
@@ -61,11 +73,13 @@ void main(int argc, char* argv[]) {
                             }
                             size = lseek(fd, 0, SEEK_END);
                             lseek(fd, 0, SEEK_SET);
+                            printf("%lf,", get_time());
                             posix_fadvise(fd, 0, size, POSIX_FADV_WILLNEED);
+                            printf("%lf\n", get_time());
                             close(fd);
                             free(targetfile);
                     }
-                    printf("prefetch is done!\n");
+                    // printf("prefetch is done!\n");
                     break;
                 }
             }
