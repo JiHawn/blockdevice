@@ -26,7 +26,8 @@ double get_time() {
 void main(int argc, char* argv[]) {
     int fd, ifd = inotify_init();
     int wd, rc ,size;
-    double start, timestamp1, timestamp2;
+    int flag = 0;
+    double start, end;
     char buffer[BUFF_SIZE];
     char target[20];
     struct dirent *ent;
@@ -35,6 +36,7 @@ void main(int argc, char* argv[]) {
 
     if(argc == 1) {
         printf("input directory name!\n");
+        return;
     }
     strcat(argv[1], "kb/");
     strcat(target, argv[1]);
@@ -73,12 +75,18 @@ void main(int argc, char* argv[]) {
                             }
                             size = lseek(fd, 0, SEEK_END);
                             lseek(fd, 0, SEEK_SET);
-                            printf("%lf,", get_time());
+                            if(!flag) {
+                                start = get_time();
+                                flag = 1;
+                            } 
                             posix_fadvise(fd, 0, size, POSIX_FADV_WILLNEED);
-                            printf("%lf\n", get_time());
+                            // printf("%lf\n", get_time());
                             close(fd);
                             free(targetfile);
                     }
+                    end = get_time();
+                    printf("%lf\n", end-start);
+
                     // printf("prefetch is done!\n");
                     break;
                 }

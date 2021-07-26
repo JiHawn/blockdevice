@@ -22,7 +22,7 @@ void main(int argc, char* argv[]) {
     char dirpath[30];
     char* filepath;
     int rc, size;
-    float start, end, result;
+    double start, end, result;
     struct dirent *ent;
     DIR *dir;
     FILE *fp;
@@ -40,7 +40,7 @@ void main(int argc, char* argv[]) {
     }
 
     buffer = malloc(1024*size);
-    // start = clock();
+    start = get_time();
     while ((ent = readdir(dir)) != NULL) {
         if(!strncmp(ent->d_name, ".", 1)) continue;
         char *filepath = malloc(sizeof(char) * 30);
@@ -51,16 +51,17 @@ void main(int argc, char* argv[]) {
             perror("failed reading file");
             return;
         }
-        // double timestamp1 = (double)(clock() - start)/CLOCKS_PER_SEC;
-        printf("%lf,", get_time());
+        // printf("%lf,", get_time());
         rc = fread(buffer, 1, 1024*4, fp);
         if (rc < 0) {
             perror("failed reading file");
             return;
         }
         // double timestamp2 = (double)(clock() - start)/CLOCKS_PER_SEC;
-        printf("%lf\n", get_time());
+        // printf("%lf\n", get_time());
         fclose(fp);
         free(filepath);
     }
+    end = get_time();
+    printf("%lf\n", end-start);
 }
