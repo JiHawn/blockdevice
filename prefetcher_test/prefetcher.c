@@ -78,7 +78,7 @@ void main(int argc, char* argv[]) {
                             //     start = get_time();
                             //     flag = 1;
                             // } 
-                            // printf("%lf\n", get_time());
+                            printf("%lf\n", get_time());
                             posix_fadvise(fd, 0, size, POSIX_FADV_WILLNEED);
                             
                             close(fd);
