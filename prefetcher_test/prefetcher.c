@@ -61,7 +61,6 @@ void main(int argc, char* argv[]) {
                         inotify_rm_watch(ifd, wd);
                         return;
                     }
-                    // start = clock();
                     while((ent = readdir(dir)) != NULL) {
                             if(!strncmp(ent->d_name, ".", 1)) continue;
                             char *targetfile = malloc(sizeof(char) * 30);
@@ -75,19 +74,19 @@ void main(int argc, char* argv[]) {
                             }
                             size = lseek(fd, 0, SEEK_END);
                             lseek(fd, 0, SEEK_SET);
-                            if(!flag) {
-                                start = get_time();
-                                flag = 1;
-                            } 
-                            posix_fadvise(fd, 0, size, POSIX_FADV_WILLNEED);
+                            // if(!flag) {
+                            //     start = get_time();
+                            //     flag = 1;
+                            // } 
                             // printf("%lf\n", get_time());
+                            posix_fadvise(fd, 0, size, POSIX_FADV_WILLNEED);
+                            
                             close(fd);
                             free(targetfile);
                     }
-                    end = get_time();
-                    printf("%lf\n", end-start);
+                    // end = get_time();
+                    // printf("%lf\n", end-start);
 
-                    // printf("prefetch is done!\n");
                     break;
                 }
             }
