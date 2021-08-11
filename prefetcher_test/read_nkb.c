@@ -19,9 +19,10 @@ double get_time() {
 
 void main(int argc, char* argv[]) {
     char* buffer;
-    char dirpath[30];
+    char* dirpath;
     char* filepath;
     int rc, size;
+    int num_of_thread;
     double start, end, result;
     struct dirent *ent;
     DIR *dir;
@@ -31,9 +32,10 @@ void main(int argc, char* argv[]) {
         printf("input file size(4 ~ 128)\n");
         return;
     }
-    strcat(argv[1], "kb/");
-    size = atoi(argv[1]);
-    dir = opendir(argv[1]);
+    dirpath = argv[1];
+    strcat(dirpath, "kb/");
+    size = atoi(dirpath);
+    dir = opendir(dirpath);
     if (dir == NULL) {
         perror("failed openning directory");
         return;
@@ -51,16 +53,16 @@ void main(int argc, char* argv[]) {
             perror("failed reading file");
             return;
         }
-        // printf("%lf,", get_time());
+        printf("%lf,", get_time());
         rc = fread(buffer, 1, 1024*size, fp);
         if (rc < 0) {
             perror("failed reading file");
             return;
         }
-        // printf("%lf\n", get_time());
+        printf("%lf\n", get_time());
         fclose(fp);
         free(filepath);
     }
     end = get_time();
-    printf("%lf\n", end-start);
+    // printf("%lf\n", end-start);
 }

@@ -29,7 +29,8 @@ double get_time() {
 
 void* prefetche(void* t) {
     struct dirent *ent;
-    int fd, size;
+    int fd;
+    off_t size;
     int* num = (int *)t;
     DIR* dir = opendir(dirpath);
     char* targetfile = malloc(sizeof(char) * 255);
