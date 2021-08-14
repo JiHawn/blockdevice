@@ -14,7 +14,9 @@
 #define BUFF_SIZE (1024*(EVENT_SIZE + 16))
 
 char* dirpath;
+char** file_list;
 int num_of_thread;
+int file_count = 0;
 
 double get_time() {
     double ms;
@@ -28,50 +30,41 @@ double get_time() {
 }
 
 void* prefetche(void* t) {
-    struct dirent *ent;
-    int fd;
-    off_t size;
+    int fd[file_count];
+    int res;
+    off_t size[file_count];
     int* num = (int *)t;
-    DIR* dir = opendir(dirpath);
     char* targetfile = malloc(sizeof(char) * 255);
-    if(dir == NULL) {
-        perror("failed openning directroy");
-        exit(-1);
-    }
-    int i = 1;
-    while((ent = readdir(dir)) != NULL) {
-        if(!strncmp(ent->d_name, ".", 1)) {
-            i++;
-            continue;
-        }
-        if(i % num_of_thread != *num) {
-            i++;
-            continue;
-        }
+    for(int i=0; i<file_count; i++) {
+        if((i+1) % num_of_thread != *num) continue;
         strcat(targetfile, dirpath);
-        strcat(targetfile, ent->d_name);
-        fd = open(targetfile, O_RDONLY);
-        if(fd < 0) {
-            perror("failed caching file");
-            exit(-1);
-        }
-        size = lseek(fd, 0, SEEK_END);
-        lseek(fd, 0, SEEK_SET);
-        printf("%lf\n", get_time());
-        posix_fadvise(fd, 0, size, POSIX_FADV_WILLNEED);
-        // printf("Thread%d: %s\n", *num, targetfile);
-        
-        close(fd);
+        strcat(targetfile, file_list[i]);
+        if((fd[i] = open(targetfile, O_RDONLY)) < 0) {
+            perror("failed file open");
+            return NULL;
+        };
+        size[i] = lseek(fd[i], 0, SEEK_END);
+        lseek(fd[i], 0, SEEK_SET);
         memset(targetfile, 0, sizeof(char) * 255);
-        i++;
     }
-    free(targetfile);
+
+    for(int i=0; i<file_count; i++) {
+        printf("%lf,", get_time());
+        if((res = posix_fadvise(fd[i], 0, size[0], POSIX_FADV_WILLNEED)) != 0) {
+            printf("fadvise error. error number: %d\n", res);
+            return NULL;
+        }
+        printf("%lf\n", get_time());
+    }
+
+    for(int i=0; i<file_count; i++) {
+        if(fd[i] > 0) close(fd[i]);
+    }
 }
 
 void main(int argc, char* argv[]) {
     int fd, ifd = inotify_init();
     int wd, rc ,size;
-    int flag = 0;
     double start, end;
     char buffer[BUFF_SIZE];
     struct dirent *ent;
@@ -103,6 +96,24 @@ void main(int argc, char* argv[]) {
         i += 2;
     }
     strcat(dirpath, "/");
+    if((dir = opendir(dirpath)) == NULL) {
+        perror("failed open directory");
+        return;
+    }
+    while((ent = readdir(dir)) != NULL) {
+        if(!strncmp(ent->d_name, ".", 1)) continue;
+        file_count++;
+    }
+    seekdir(dir, SEEK_SET);
+    char* files[file_count];
+    i = 0;
+    while((ent = readdir(dir)) != NULL) {
+        if(!strncmp(ent->d_name, ".", 1)) continue;
+        files[i] = ent->d_name;
+        i++;
+    }
+    file_list = files;
+    
     pthread_t p_thread[num_of_thread];
     wd = inotify_add_watch(ifd, dirpath, IN_ACCESS);
     if(wd == -1) {
@@ -120,8 +131,8 @@ void main(int argc, char* argv[]) {
                     int args[num_of_thread];
                     for(int j=0; j<num_of_thread; j++) {
                         args[j] = j;
-                        int thr = pthread_create(&p_thread[j], NULL, prefetche, (void *)&args[j]);
-                        if(thr<0) {
+                        int thr;
+                        if(thr = pthread_create(&p_thread[j], NULL, prefetche, (void *)&args[j])<0) {
                             perror("thread create error:");
                             exit(0);
                         }
