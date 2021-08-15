@@ -50,10 +50,7 @@ void* prefetche(void* t) {
 
     for(int i=0; i<file_count; i++) {
         printf("%lf,", get_time());
-        if((res = posix_fadvise(fd[i], 0, size[0], POSIX_FADV_WILLNEED)) != 0) {
-            printf("fadvise error. error number: %d\n", res);
-            return NULL;
-        }
+	if(fd[i] > 0) posix_fadvise(fd[i], 0, size[i], POSIX_FADV_WILLNEED);
         printf("%lf\n", get_time());
     }
 
