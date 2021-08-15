@@ -22,11 +22,9 @@ void main(int argc, char* argv[]) {
     char* dirpath;
     char* filepath;
     int rc, size;
-    int num_of_thread;
-    double start, end, result;
+    int file_count = 0;
     struct dirent *ent;
     DIR *dir;
-    FILE *fp;
 
     if(argc == 1) {
         printf("input file size(4 ~ 128)\n");
@@ -41,28 +39,66 @@ void main(int argc, char* argv[]) {
         return;
     }
 
-    buffer = malloc(1024*size);
-    start = get_time();
-    while ((ent = readdir(dir)) != NULL) {
+    while((ent = readdir(dir)) != NULL) {
         if(!strncmp(ent->d_name, ".", 1)) continue;
-        char *filepath = malloc(sizeof(char) * 30);
+        file_count++;
+    }
+    FILE *fp[file_count];
+    double start[file_count];
+    double end[file_count];
+    int i = 0;
+    seekdir(dir, SEEK_SET);
+    while((ent = readdir(dir)) != NULL) {
+        if(!strncmp(ent->d_name, ".", 1)) continue;
+        char* filepath = malloc(sizeof(char) * 30);
         strcat(filepath, argv[1]);
         strcat(filepath, ent->d_name);
-        fp = fopen(filepath, "r");
-        if(fp < 0) {
-            perror("failed reading file");
+        if((fp[i] = fopen(filepath, "r")) < 0) {
+            perror("failed open file");
             return;
         }
-        printf("%lf,", get_time());
-        rc = fread(buffer, 1, 1024*size, fp);
-        if (rc < 0) {
-            perror("failed reading file");
-            return;
-        }
-        printf("%lf\n", get_time());
-        fclose(fp);
         free(filepath);
+        i++;
     }
-    end = get_time();
+
+    buffer = malloc(1024*size);
+    for(int i=0; i<file_count; i++) {
+        start[i] = get_time();
+        if((rc = fread(buffer, 1, 1024*size, fp[i])) < 0 ) {
+            perror("failed reading file");
+            return;
+        }
+        end[i] = get_time();
+    }
+
+    for(int i=0; i<file_count; i++) {
+        printf("%lf,%lf\n", start[i], end[i]);
+        fclose(fp[i]);
+    }
+    free(buffer);
+
+    // buffer = malloc(1024*size);
+    // start = get_time();
+    // while ((ent = readdir(dir)) != NULL) {
+    //     if(!strncmp(ent->d_name, ".", 1)) continue;
+    //     char *filepath = malloc(sizeof(char) * 30);
+    //     strcat(filepath, argv[1]);
+    //     strcat(filepath, ent->d_name);
+    //     fp = fopen(filepath, "r");
+    //     if(fp < 0) {
+    //         perror("failed reading file");
+    //         return;
+    //     }
+    //     printf("%lf,", get_time());
+    //     rc = fread(buffer, 1, 1024*size, fp);
+    //     if (rc < 0) {
+    //         perror("failed reading file");
+    //         return;
+    //     }
+    //     printf("%lf\n", get_time());
+    //     fclose(fp);
+    //     free(filepath);
+    // }
+    // end = get_time();
     // printf("%lf\n", end-start);
 }
