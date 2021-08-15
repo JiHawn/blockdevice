@@ -14,7 +14,10 @@ i = 1
 for path in full_path:
     res = Popen(['sudo', '-S', 'hdparm', '--fibmap', path], stdout=PIPE)
     out, err = res.communicate()
-    file_lba = int(out.decode()[164:175])
+    if len(path) == 21:
+        file_lba = int(out.decode()[159:168])
+    else:
+        file_lba = int(out.decode()[160:169])
     issue_time.append([i, file_lba])
     complete_time.append([i, file_lba])
     i += 1
