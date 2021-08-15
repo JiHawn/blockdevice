@@ -35,6 +35,8 @@ void* prefetche(void* t) {
     off_t size[file_count];
     int* num = (int *)t;
     char* targetfile = malloc(sizeof(char) * 255);
+    double start[file_count];
+    double end[file_count];
     for(int i=0; i<file_count; i++) {
         if((i+1) % num_of_thread != *num) continue;
         strcat(targetfile, dirpath);
@@ -49,16 +51,21 @@ void* prefetche(void* t) {
     }
 
     for(int i=0; i<file_count; i++) {
-        printf("%lf,", get_time());
-        if((res = posix_fadvise(fd[i], 0, size[0], POSIX_FADV_WILLNEED)) != 0) {
-            printf("fadvise error. error number: %d\n", res);
-            return NULL;
+        if(fd[i] > 0) {
+            start[i] = get_time();
+            if((res = posix_fadvise(fd[i], 0, size[0], POSIX_FADV_WILLNEED)) != 0) {
+                printf("fadvise error. error number: %d\n", res);
+                return NULL;
+            }
+            end[i] = get_time();
         }
-        printf("%lf\n", get_time());
     }
 
     for(int i=0; i<file_count; i++) {
-        if(fd[i] > 0) close(fd[i]);
+        if(fd[i] > 0) {
+            printf("%ld,%ld\n", start[i], end[i]);
+            close(fd[i]);
+        }
     }
 }
 
