@@ -10,6 +10,8 @@ full_path = [path_dir + x for x in file_path]
 issue_time = []
 complete_time = []
 i = 1
+qd = 0
+max_qd = 0
 
 for path in full_path:
     res = Popen(['sudo', '-S', 'hdparm', '--fibmap', path], stdout=PIPE)
@@ -21,13 +23,13 @@ for path in full_path:
 
 f = open('temp.txt', 'r')
 today = date.today().strftime("%Y-%m-%d ")
+trace = []
 
 while True:
     line = f.readline()
     if not line:
         break
     splited = line.split(' ')
-    blk_lba = int(splited[4])
     blk_time = splited[6]
     blk_datetime = today + blk_time[:-8]
     try:
@@ -35,18 +37,31 @@ while True:
         blk_timestamp = time.mktime(datetime.strptime(blk_datetime, '%Y-%m-%d %H:%M:%S').timetuple()) + blk_micro
     except ValueError:
         continue
+    splited[6] = blk_timestamp
+    trace.append(splited)
 
-    if splited[3] == 'D':
-        for i in issue_time:
-            if blk_lba == i[1]:
-                i[1] = blk_timestamp
+for i in trace:
+
+    blk_lba = int(i[4])
+    blk_timestamp = i[6]
+
+    if i[3] == 'D':
+        qd += 1
+        if max_qd < qd:
+            max_qd = qd
+        for j in issue_time:
+            if blk_lba == j[1]:
+                j[1] = blk_timestamp
                 break
-    elif splited[3] == 'C':
-        for i in complete_time:
-            if blk_lba == i[1]:
-                i[1] = blk_timestamp
+    elif i[3] == 'C':
+        qd -= 1
+        for j in complete_time:
+            if blk_lba == j[1]:
+                j[1] = blk_timestamp
                 break
 f.close()
 
 for issue, complete in zip(issue_time, complete_time):
     print(str(issue[1]) + "," + str(complete[1]))
+
+print(max_qd)
