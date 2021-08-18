@@ -44,11 +44,12 @@ void* prefetche(void* t) {
         if((fd[i] = open(targetfile, O_RDONLY)) < 0) {
             perror("failed file open");
             return NULL;
-        };
+        }
         size[i] = lseek(fd[i], 0, SEEK_END);
         lseek(fd[i], 0, SEEK_SET);
         memset(targetfile, 0, sizeof(char) * 255);
     }
+
 
     for(int i=0; i<file_count; i++) {
         if(fd[i] > 0) {
@@ -63,7 +64,7 @@ void* prefetche(void* t) {
 
     for(int i=0; i<file_count; i++) {
         if(fd[i] > 0) {
-            printf("%lf,%lf\n", start[i], end[i]);
+            printf("%d,%lf,%lf\n", i, start[i], end[i]);
             close(fd[i]);
         }
     }
