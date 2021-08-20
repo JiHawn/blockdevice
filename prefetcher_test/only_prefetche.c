@@ -13,7 +13,7 @@ char* dirpath;
 char** file_list;
 int num_of_thread;
 int file_count = 0;
-double app_start;
+int app_start;
 
 double get_time() {
     double ms;
@@ -27,7 +27,7 @@ double get_time() {
 }
 
 void* prefetche(void* t) {
-    int count = file_count/2 + 1;
+    int count = file_count/num_of_thread + 1;
     int fd[count];
     int fadvise_res;
     off_t size[count];
@@ -54,7 +54,7 @@ void* prefetche(void* t) {
     }
     
     while(1) {
-        if(app_start == get_time() - 2) break;
+        if(app_start == (int)get_time() - 2) break;
     }
 
     for(int i=0; i<count; i++) {
