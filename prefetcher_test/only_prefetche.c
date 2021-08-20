@@ -52,6 +52,10 @@ void* prefetche(void* t) {
         memset(targetfile, 0, sizeof(char) * 255);
         j++;
     }
+    
+    while(1) {
+        if(app_start == get_time() - 2) break;
+    }
 
     for(int i=0; i<count; i++) {
         if(fd[i] < 0) break;
@@ -61,9 +65,6 @@ void* prefetche(void* t) {
                 return NULL;
             }
         end[i] = get_time();
-    }
-    while(1) {
-        if(app_start == get_time() - 2) break;
     }
 
     for(int i=0; i<count; i++) {

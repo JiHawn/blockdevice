@@ -1,2 +1,2 @@
-drop cache: echo 1 | sudo tee /proc/sys/vm/drop_caches
-block trace : sudo blktrace -d /dev/sda -a issue -a complete -o - | blkparse -f "%M %m %d %a %S %N %z\n" -i - | grep "RA"
+echo 1 | sudo tee /proc/sys/vm/drop_caches
+sudo blktrace -d /dev/nvme0n1p1 -a issue -a complete -o - | blkparse -f "%M %m %d %a %S %N %z\n" -i - | grep "RA"
