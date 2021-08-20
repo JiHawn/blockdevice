@@ -14,6 +14,8 @@ i = 1
 qd = 0
 max_qd = 0
 count = 0
+start_time = 0
+end_time = 0
 
 for path in full_path:
     res = Popen(['sudo', '-S', 'hdparm', '--fibmap', path], stdout=PIPE)
@@ -28,6 +30,8 @@ for path in full_path:
     issue_time.append([i, file_lba])
     complete_time.append([i, file_lba])
     i += 1
+    print("path:", path)
+    print("lba:", file_lba)
 
 f = open('temp.txt', 'r')
 today = date.today().strftime("%Y-%m-%d ")
@@ -43,6 +47,9 @@ while True:
     try:
         blk_micro = float(blk_time[-7:-1]) / 1000000
         blk_timestamp = time.mktime(datetime.strptime(blk_datetime, '%Y-%m-%d %H:%M:%S').timetuple()) + blk_micro
+        if start_time == 0:
+            start_time = blk_timestamp
+        end_time = blk_timestamp
     except ValueError:
         continue
     splited[6] = blk_timestamp
@@ -76,4 +83,4 @@ if len(sys.argv) == 2:
             print(str(issue[1]) + "," + str(complete[1]))
 
 print("max_QD =\t", max_qd)
-print("time =\t", str(complete_time[-1][1] - issue_time[0][1]))
+print("time =\t", str(end_time - start_time))
