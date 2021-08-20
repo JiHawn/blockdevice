@@ -30,8 +30,6 @@ for path in full_path:
     issue_time.append([i, file_lba])
     complete_time.append([i, file_lba])
     i += 1
-    print("path:", path)
-    print("lba:", file_lba)
 
 f = open('temp.txt', 'r')
 today = date.today().strftime("%Y-%m-%d ")
