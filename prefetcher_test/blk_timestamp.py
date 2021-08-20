@@ -3,6 +3,7 @@ from datetime import datetime, date
 
 import time
 import os
+import sys
 
 path_dir = '4kb/'
 file_path = os.listdir(path_dir)
@@ -12,6 +13,7 @@ complete_time = []
 i = 1
 qd = 0
 max_qd = 0
+count = 0
 
 for path in full_path:
     res = Popen(['sudo', '-S', 'hdparm', '--fibmap', path], stdout=PIPE)
@@ -55,6 +57,7 @@ for i in trace:
         for j in issue_time:
             if blk_lba == j[1]:
                 j[1] = blk_timestamp
+                count += 1
                 break
     elif i[3] == 'C':
         qd -= 1
@@ -64,7 +67,10 @@ for i in trace:
                 break
 f.close()
 
-for issue, complete in zip(issue_time, complete_time):
-    print(str(issue[1]) + "," + str(complete[1]))
+if len(sys.argv) == 2:
+    if sys.argv[1] == 'y':
+        for issue, complete in zip(issue_time, complete_time):
+            print(str(issue[1]) + "," + str(complete[1]))
 
-print(max_qd)
+print("max_QD =\t", max_qd)
+print("time =\t", str(complete_time[-1][1] - issue_time[0][1]))
