@@ -23,7 +23,7 @@ for path in full_path:
     elif len(path) == 22:
         file_lba = int(out.decode()[160:169])
     else:
-        file_lba = int(out.decode()[162:170])
+        file_lba = int(out.decode()[161:170])
 
     issue_time.append([i, file_lba])
     complete_time.append([i, file_lba])
