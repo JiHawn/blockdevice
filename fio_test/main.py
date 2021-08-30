@@ -45,6 +45,6 @@ for i in logs:
         if ts > r_end:
             r_end = ts
 
-print('RM spend time:', rm_end - rm_start)
-print('RA spend time:', ra_end - ra_start)
-print('R spend time:', r_end - r_start)
+print('RM spend time:', (rm_end - rm_start) * 1000)
+print('RA spend time:', (ra_end - ra_start) * 1000)
+print('R spend time:', (r_end - r_start) * 1000)
