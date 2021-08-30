@@ -24,6 +24,8 @@ rm_start = float(logs[-1][6])
 rm_end = 0
 ra_start = float(logs[-1][6])
 ra_end = 0
+r_start = float(logs[-1][6])
+r_end = 0
 
 for i in logs:
     ts = float(i[6])
@@ -37,6 +39,12 @@ for i in logs:
             ra_start = ts
         if ts > rm_end:
             ra_end = ts
+    elif i[2] == 'R':
+        if ts < r_start:
+            r_start = ts
+        if ts > r_end:
+            r_end = ts
 
-print('rm spend time:', rm_end - rm_start)
-print('ra spend time:', ra_end - ra_start)
+print('RM spend time:', rm_end - rm_start)
+print('RA spend time:', ra_end - ra_start)
+print('R spend time:', r_end - r_start)
