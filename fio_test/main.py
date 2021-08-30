@@ -51,6 +51,9 @@ for i in logs:
         if ts > r_end:
             r_end = ts
 
-print('# of RM:', str(rm), 'RM spend time:', (rm_end - rm_start) * 1000)
-print('# of RA:', str(ra), 'RA spend time:', (ra_end - ra_start) * 1000)
-print('# of R:', str(r), 'R spend time:', (r_end - r_start) * 1000)
+print('# of RM:', str(rm))
+print('RM spend time:', (rm_end - rm_start) * 1000)
+print('# of RA:', str(ra))
+print('RA spend time:', (ra_end - ra_start) * 1000)
+print('# of R:', str(r))
+print('R spend time:', (r_end - r_start) * 1000)
