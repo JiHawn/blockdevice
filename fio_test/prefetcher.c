@@ -124,6 +124,7 @@ void main(int argc, char* argv[]) {
     i = 0;
     while((ent = readdir(dir)) != NULL) {
         if(!strncmp(ent->d_name, ".", 1)) continue;
+        printf("%s\n", ent->d_name);
         files[i] = ent->d_name;
         i++;
     }
