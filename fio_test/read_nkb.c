@@ -46,8 +46,8 @@ void main(int argc, char* argv[]) {
     FILE *fp[file_count];
     double start[file_count];
     double end[file_count];
-    double t_start;
-    double t_end;
+    double r_start, r_end, c_start, c_end;
+    
     int i = 0;
     seekdir(dir, SEEK_SET);
     while((ent = readdir(dir)) != NULL) {
@@ -64,7 +64,7 @@ void main(int argc, char* argv[]) {
     }
 
     buffer = malloc(1024*4);
-    t_start = get_time();
+    r_start = get_time();
     for(int i=0; i<file_count; i++) {
         start[i] = get_time();
         if((rc = fread(buffer, 1, 1024*4, fp[i])) < 0 ) {
@@ -74,13 +74,15 @@ void main(int argc, char* argv[]) {
         end[i] = get_time();
         memset(buffer, 0, 1024*4);
     }
-    t_end = get_time();
-
+    r_end = get_time();
+    c_start = get_time();
     for(int i=0; i<file_count; i++) {
         // printf("%lf,%lf\n", start[i], end[i]);
         fclose(fp[i]);
     }
-    printf("%lf\n", t_end - t_start);
+    c_end = get_time();
+    printf("read running time: %lf\n", r_end - r_start);
+    printf("close running time:%lf\n", c_end - c_start);
     free(buffer);
 
     // buffer = malloc(1024*size);
