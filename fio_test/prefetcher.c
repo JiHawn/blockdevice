@@ -37,6 +37,8 @@ void* prefetche(void* t) {
     char* targetfile = malloc(sizeof(char) * 255);
     double start[file_count];
     double end[file_count];
+    double t_start;
+    double t_end;
     for(int i=0; i<file_count; i++) {
         fd[i] = -1;
     }
@@ -53,7 +55,7 @@ void* prefetche(void* t) {
         memset(targetfile, 0, sizeof(char) * 255);
     }
 
-
+    t_start = get_time();
     for(int i=0; i<file_count; i++) {
         if(fd[i] > 0) {
             start[i] = get_time();
@@ -64,13 +66,15 @@ void* prefetche(void* t) {
             end[i] = get_time();
         }
     }
+    t_end = get_time();
 
     for(int i=0; i<file_count; i++) {
         if(fd[i] > 0) {
-            printf("%d,%lf,%lf\n", i, start[i], end[i]);
+            // printf("%d,%lf,%lf\n", i, start[i], end[i]);
             close(fd[i]);
         }
     }
+    printf("%lf\n", t_end - t_start);
 }
 
 void main(int argc, char* argv[]) {
