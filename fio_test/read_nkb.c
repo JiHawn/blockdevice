@@ -27,7 +27,7 @@ void main(int argc, char* argv[]) {
     DIR *dir;
 
     if(argc == 1) {
-        printf("input file size(4 ~ 128)\n");
+        printf("input directory\n");
         return;
     }
     dirpath = argv[1]; 
@@ -61,14 +61,15 @@ void main(int argc, char* argv[]) {
         i++;
     }
 
-    buffer = malloc(1024*size);
+    buffer = malloc(1024*4);
     for(int i=0; i<file_count; i++) {
         start[i] = get_time();
-        if((rc = fread(buffer, 1, 1024*size, fp[i])) < 0 ) {
+        if((rc = fread(buffer, 1, 1024*4, fp[i])) < 0 ) {
             perror("failed reading file");
             return;
         }
         end[i] = get_time();
+        memset(buffer, 0, 1024*4);
     }
 
     for(int i=0; i<file_count; i++) {
