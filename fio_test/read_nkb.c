@@ -21,7 +21,6 @@ double get_time() {
 void main(int argc, char* argv[]) {
     char* buffer;
     char* dirpath;
-    char* filepath;
     int rc;
     int file_count = 0;
     struct dirent *ent;
