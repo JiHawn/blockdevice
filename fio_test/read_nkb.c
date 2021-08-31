@@ -50,6 +50,7 @@ void main(int argc, char* argv[]) {
     double end[file_count];
     
     int i = 0;
+    
     seekdir(dir, SEEK_SET);
     char* filepath = malloc(sizeof(char) * 255);
     while((ent = readdir(dir)) != NULL) {
