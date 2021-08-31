@@ -46,6 +46,7 @@ void* prefetche(void* t) {
         if((i+1) % num_of_thread != *num) continue;
         strcat(targetfile, dirpath);
         strcat(targetfile, file_list[i]);
+        printf("%s\n", targetfile);
         if((fd[i] = open(targetfile, O_RDONLY)) < 0) {
             printf("failed file open: %s, error number: %d\n", targetfile, fd[i]);
             return NULL;
@@ -124,7 +125,6 @@ void main(int argc, char* argv[]) {
     i = 0;
     while((ent = readdir(dir)) != NULL) {
         if(!strncmp(ent->d_name, ".", 1)) continue;
-        printf("%s\n", ent->d_name);
         files[i] = ent->d_name;
         i++;
     }
