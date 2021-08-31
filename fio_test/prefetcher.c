@@ -129,7 +129,9 @@ void main(int argc, char* argv[]) {
         i++;
     }
     file_list = files;
-    
+    for(int i=0; i<file_count; i++) {
+        printf("%s\n", file_list[i]);
+    }
     pthread_t p_thread[num_of_thread];
     wd = inotify_add_watch(ifd, dirpath, IN_ACCESS);
     if(wd == -1) {
