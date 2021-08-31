@@ -107,7 +107,7 @@ void main(int argc, char* argv[]) {
         strcat(file_path, ent->d_name);
         if((fd[i] = open(file_path, O_RDONLY)) < 0) {
             printf("failed file open: %s, error number: %d\n", file_path, fd[i]);
-            return NULL;
+            return;
         }
         size[i] = lseek(fd[i], 0, SEEK_END);
         lseek(fd[i], 0, SEEK_SET);
