@@ -13,10 +13,11 @@
 #define EVENT_SIZE (sizeof(struct inotify_event))
 #define BUFF_SIZE (1024*(EVENT_SIZE + 16))
 
-char* dirpath;
-char** file_list;
+int* metadata;
+int* metadata_size;
 int num_of_thread;
 int file_count = 0;
+double g_start = 0, g_end = 0;
 
 double get_time() {
     double ms;
@@ -30,59 +31,27 @@ double get_time() {
 }
 
 void* prefetche(void* t) {
-    int fd[file_count];
     int res;
-    off_t size[file_count];
     int* num = (int *)t;
-    char* targetfile = malloc(sizeof(char) * 255);
     double start[file_count];
     double end[file_count];
-    double t_start;
-    double t_end;
-    for(int i=0; i<file_count; i++) {
-        fd[i] = -1;
-    }
+    if(g_start == 0) g_start = get_time();
     for(int i=0; i<file_count; i++) {
         if((i+1) % num_of_thread != *num) continue;
-        strcat(targetfile, dirpath);
-        strcat(targetfile, file_list[i]);
-        printf("%s\n", targetfile);
-        if((fd[i] = open(targetfile, O_RDONLY)) < 0) {
-            printf("failed file open: %s, error number: %d\n", targetfile, fd[i]);
+        start[i] = get_time();
+        if((res = posix_fadvise(metadata[i], 0, metadata_size[i], POSIX_FADV_WILLNEED)) != 0) {
+            printf("fadvise error. error number: %d\n", res);
             return NULL;
         }
-        size[i] = lseek(fd[i], 0, SEEK_END);
-        lseek(fd[i], 0, SEEK_SET);
-        memset(targetfile, 0, sizeof(char) * 255);
+        end[i] = get_time();
     }
-
-    t_start = get_time();
-    for(int i=0; i<file_count; i++) {
-        if(fd[i] > 0) {
-            start[i] = get_time();
-            if((res = posix_fadvise(fd[i], 0, size[i], POSIX_FADV_WILLNEED)) != 0) {
-                printf("fadvise error. error number: %d\n", res);
-                return NULL;
-            }
-            end[i] = get_time();
-        }
-    }
-    t_end = get_time();
-
-    for(int i=0; i<file_count; i++) {
-        if(fd[i] > 0) {
-            // printf("%d,%lf,%lf\n", i, start[i], end[i]);
-            close(fd[i]);
-        }
-    }
-    printf("%lf\n", t_end - t_start);
 }
 
 void main(int argc, char* argv[]) {
-    int fd, ifd = inotify_init();
-    int wd, rc ,size;
-    double start, end;
+    int ifd = inotify_init();
+    int wd;
     char buffer[BUFF_SIZE];
+    char* dirpath;
     struct dirent *ent;
     DIR *dir;
     FILE *pfd;
@@ -112,27 +81,44 @@ void main(int argc, char* argv[]) {
         i += 2;
     }
     strcat(dirpath, "/");
+    // open directory
     if((dir = opendir(dirpath)) == NULL) {
         perror("failed open directory");
         return;
     }
+
+    // get # of files
     while((ent = readdir(dir)) != NULL) {
         if(!strncmp(ent->d_name, ".", 1)) continue;
         file_count++;
     }
+
+
     seekdir(dir, SEEK_SET);
-    char* files[file_count];
+    char* file_path = malloc(sizeof(char) * 255);
+    int fd[file_count];
+    int size[file_count];
     i = 0;
+
+    //get metadata
     while((ent = readdir(dir)) != NULL) {
         if(!strncmp(ent->d_name, ".", 1)) continue;
-        files[i] = ent->d_name;
+        strcat(file_path, dirpath);
+        strcat(file_path, ent->d_name);
+        if((fd[i] = open(file_path, O_RDONLY)) < 0) {
+            printf("failed file open: %s, error number: %d\n", file_path, fd[i]);
+            return NULL;
+        }
+        size[i] = lseek(fd[i], 0, SEEK_END);
+        lseek(fd[i], 0, SEEK_SET);
+        memset(file_path, 0, sizeof(char) * 255);
         i++;
     }
-    file_list = files;
-    for(int i=0; i<file_count; i++) {
-        printf("%s\n", file_list[i]);
-    }
+    metadata = fd;
+    metadata_size = size;
     pthread_t p_thread[num_of_thread];
+    
+    // start monitoring directory
     wd = inotify_add_watch(ifd, dirpath, IN_ACCESS);
     if(wd == -1) {
         perror("Wrong directory name");
@@ -146,6 +132,7 @@ void main(int argc, char* argv[]) {
             struct inotify_event *event = (struct inotify_event*)&buffer[i];
             if(event->len) {
                 if(event->mask & IN_ACCESS) {
+                    // monitor ACCESS
                     int args[num_of_thread];
                     for(int j=0; j<num_of_thread; j++) {
                         args[j] = j;
@@ -159,8 +146,8 @@ void main(int argc, char* argv[]) {
                     for(int j=0; j<num_of_thread; j++) {
                         pthread_join(p_thread[j], NULL);
                     }
-                    // end = get_time();
-                    // printf("%lf\n", end-start);
+                    g_end = get_time();
+                    printf("%lf\n", g_end - g_start);
                     break;
                 }
             }
