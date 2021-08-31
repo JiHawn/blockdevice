@@ -47,7 +47,7 @@ void* prefetche(void* t) {
         strcat(targetfile, dirpath);
         strcat(targetfile, file_list[i]);
         if((fd[i] = open(targetfile, O_RDONLY)) < 0) {
-            printf("failed file open: %s", targetfile);
+            printf("failed file open: %s, error number: %d\n", targetfile, fd[i]);
             return NULL;
         }
         size[i] = lseek(fd[i], 0, SEEK_END);
