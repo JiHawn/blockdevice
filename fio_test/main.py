@@ -19,6 +19,7 @@ while True:
         continue
     split[6] = str(timestamp)
     logs.append(split)
+f.close()
 
 rm_start = float(logs[-1][6])
 rm_end = 0
@@ -29,6 +30,8 @@ r_end = 0
 rm = 0
 ra = 0
 r = 0
+qd_single = 0
+qd = []
 
 for i in logs:
     ts = float(i[6])
@@ -51,9 +54,19 @@ for i in logs:
         if ts > r_end:
             r_end = ts
 
+    if i[3] == 'D':
+        qd_single += 1
+    elif i[3] == 'C':
+        qd_single -= 1
+    qd.append(qd_single)
+
 print('# of RM:', str(rm))
 print('RM spend time:', (rm_end - rm_start) * 1000)
 print('# of RA:', str(ra))
 print('RA spend time:', (ra_end - ra_start) * 1000)
 print('# of R:', str(r))
 print('R spend time:', (r_end - r_start) * 1000)
+
+output = open('./qd_log.csv', 'w')
+for i in qd:
+    output.write(str(i) + '\n')
