@@ -66,7 +66,6 @@ void main(int argc, char* argv[]) {
         lseek(fd[i], 0, SEEK_SET);
          memset(filepath, 0, sizeof(char) * 255);
         i++;
-        char tmp = getchar();
     }
 
     buffer = malloc(size_max);
