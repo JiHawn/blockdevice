@@ -24,7 +24,7 @@ void main(int argc, char* argv[]) {
     int rc;
     int file_count = 0;
     struct dirent *ent;
-    double r_start, r_end;
+    double o_start, o_end, r_start, r_end;
     DIR *dir;
 
     if(argc == 1) {
@@ -52,7 +52,7 @@ void main(int argc, char* argv[]) {
     int i = 0;
     
     seekdir(dir, SEEK_SET);
-    r_start = get_time();
+    o_start = get_time();
     char* filepath = malloc(sizeof(char) * 255);
     while((ent = readdir(dir)) != NULL) {
         if(!strncmp(ent->d_name, ".", 1)) continue;
@@ -68,7 +68,9 @@ void main(int argc, char* argv[]) {
          memset(filepath, 0, sizeof(char) * 255);
         i++;
     }
+    o_end = get_time();
 
+    r_start = get_time();
     buffer = malloc(size_max);
     for(int i=0; i<file_count; i++) {
         start[i] = get_time();
@@ -80,6 +82,7 @@ void main(int argc, char* argv[]) {
         memset(buffer, 0, size_max);
     }
     r_end = get_time();
+    printf("open running time: %lf\n", o_end - o_start);
     printf("read running time: %lf\n", r_end - r_start);
     free(buffer);
 }
