@@ -36,7 +36,7 @@ void main(int argc, char* argv[]) {
     
     size = lseek(fd, 0, SEEK_END);
     iter = size/4096;
-    buffer = malloc(sizeof(char) * 4096);
+    buffer = aligned_alloc(4096, 4096);
     for(int i=0; i<iter; i++) {
         lseek(fd, pointer*4096, SEEK_SET);
         if((rc = read(fd, buffer, 4096)) < 0 ) {
