@@ -60,12 +60,12 @@ for i in logs:
         qd_single -= 1
     qd.append(qd_single)
 
-print('# of RM:', str(rm))
-print('RM spend time:', (rm_end - rm_start) * 1000)
-print('# of RA:', str(ra))
-print('RA spend time:', (ra_end - ra_start) * 1000)
-print('# of R:', str(r))
-print('R spend time:', (r_end - r_start) * 1000)
+# print('# of RM:', str(rm))
+# print('RM spend time:', (rm_end - rm_start) * 1000)
+# print('# of RA:', str(ra))
+# print('RA spend time:', (ra_end - ra_start) * 1000)
+# print('# of R:', str(r))
+# print('R spend time:', (r_end - r_start) * 1000)
 
-avg = sum(qd) / len(qd)
+avg = sum(qd, 0.0) / len(qd)
 print("average of qd:", str(qd))
