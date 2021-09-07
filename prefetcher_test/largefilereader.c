@@ -28,6 +28,7 @@ void main(int argc, char* argv[]) {
     }
     filepath = argv[1];
 
+    start = get_time();
     if((fd = open(filepath, O_RDONLY)) < 0) {
         perror("failed open file");
         exit(0);
@@ -45,4 +46,6 @@ void main(int argc, char* argv[]) {
         pointer += prime;
         if(pointer >= iter) pointer -= iter;
     }
+    end = get_time();
+    printf("running time: %lf\n", end - start);
 }
