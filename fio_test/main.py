@@ -67,5 +67,5 @@ for i in logs:
 # print('# of R:', str(r))
 # print('R spend time:', (r_end - r_start) * 1000)
 
-avg = sum(qd, 0.0) / len(qd)
-print("average of qd:", str(qd))
+avg = sum(qd) / len(qd)
+print("average of qd:", str(avg))
