@@ -52,6 +52,7 @@ void main(int argc, char* argv[]) {
     int i = 0;
     
     seekdir(dir, SEEK_SET);
+    r_start = get_time();
     char* filepath = malloc(sizeof(char) * 255);
     while((ent = readdir(dir)) != NULL) {
         if(!strncmp(ent->d_name, ".", 1)) continue;
@@ -69,7 +70,6 @@ void main(int argc, char* argv[]) {
     }
 
     buffer = malloc(size_max);
-    r_start = get_time();
     for(int i=0; i<file_count; i++) {
         start[i] = get_time();
         if((rc = read(fd[i], buffer, size[i])) < 0 ) {
