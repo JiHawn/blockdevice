@@ -29,7 +29,7 @@ void main(int argc, char* argv[]) {
     filepath = argv[1];
 
     start = get_time();
-    if((fd = open(filepath, O_RDONLY)) < 0) {
+    if((fd = open(filepath, O_RDONLY | __O_DIRECT)) < 0) {
         perror("failed open file");
         exit(0);
     }
