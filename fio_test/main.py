@@ -67,6 +67,5 @@ print('RA spend time:', (ra_end - ra_start) * 1000)
 print('# of R:', str(r))
 print('R spend time:', (r_end - r_start) * 1000)
 
-output = open('./qd_log.csv', 'w')
-for i in qd:
-    output.write(str(i) + '\n')
+avg = sum(qd) / len(qd)
+print("average of qd:", str(qd))
