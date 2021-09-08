@@ -101,6 +101,7 @@ void main(int argc, char* argv[]) {
             size_single = lseek(fd_single, 0, SEEK_END);
             lseek(fd_single, 0, SEEK_SET);
             memset(filepath, 0, sizeof(char) * 255);
+            buffer = malloc(size_single);
             if((rc = read(fd_single, buffer, size_single)) < 0 ) {
                 perror("failed reading file");
                 return;
