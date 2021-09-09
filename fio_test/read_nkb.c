@@ -106,7 +106,6 @@ void main(int argc, char* argv[]) {
                 perror("failed reading file");
                 return;
             }
-            close(fd_single);
         }
         m2_end = get_time();
         printf("running time: %lf\n", m2_end - m2_start);
