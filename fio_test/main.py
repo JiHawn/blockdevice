@@ -1,9 +1,11 @@
 from datetime import datetime, date
 import time
 
+res = open('./qd_log_timestamp.txt', 'w')
 f = open('blkoutput.txt', 'r')
 today = date.today().strftime("%Y-%m-%d ")
 logs = []
+
 
 while True:
     line = f.readline()
@@ -21,44 +23,48 @@ while True:
     logs.append(split)
 f.close()
 
-rm_start = float(logs[-1][6])
-rm_end = 0
-ra_start = float(logs[-1][6])
-ra_end = 0
-r_start = float(logs[-1][6])
-r_end = 0
-rm = 0
-ra = 0
-r = 0
-qd_single = 0
-qd = []
-
 for i in logs:
-    ts = float(i[6])
-    if i[2] == 'RM':
-        rm += 1
-        if ts < rm_start:
-            rm_start = ts
-        if ts > rm_end:
-            rm_end = ts
-    elif i[2] == 'RA':
-        ra += 1
-        if ts < ra_start:
-            ra_start = ts
-        if ts > rm_end:
-            ra_end = ts
-    elif i[2] == 'R':
-        r += 1
-        if ts < r_start:
-            r_start = ts
-        if ts > r_end:
-            r_end = ts
+    data = f"{i[0]},{i[1]},{i[2]},{i[3]},{i[4]},{i[5]},{i[6]}"
+    res.write(data)
 
-    if i[3] == 'D':
-        qd_single += 1
-    elif i[3] == 'C':
-        qd_single -= 1
-    qd.append(qd_single)
+# rm_start = float(logs[-1][6])
+# rm_end = 0
+# ra_start = float(logs[-1][6])
+# ra_end = 0
+# r_start = float(logs[-1][6])
+# r_end = 0
+# rm = 0
+# ra = 0
+# r = 0
+# qd_single = 0
+# qd = []
+
+# for i in logs:
+#     ts = float(i[6])
+#     if i[2] == 'RM':
+#         rm += 1
+#         if ts < rm_start:
+#             rm_start = ts
+#         if ts > rm_end:
+#             rm_end = ts
+#     elif i[2] == 'RA':
+#         ra += 1
+#         if ts < ra_start:
+#             ra_start = ts
+#         if ts > rm_end:
+#             ra_end = ts
+#     elif i[2] == 'R':
+#         r += 1
+#         if ts < r_start:
+#             r_start = ts
+#         if ts > r_end:
+#             r_end = ts
+#
+#     if i[3] == 'D':
+#         qd_single += 1
+#     elif i[3] == 'C':
+#         qd_single -= 1
+#     qd.append(qd_single)
 
 # print('# of RM:', str(rm))
 # print('RM spend time:', (rm_end - rm_start) * 1000)
@@ -67,5 +73,5 @@ for i in logs:
 # print('# of R:', str(r))
 # print('R spend time:', (r_end - r_start) * 1000)
 
-avg = sum(qd) / len(qd)
-print("average of qd:", str(avg))
+# avg = sum(qd) / len(qd)
+# print("average of qd:", str(avg))
