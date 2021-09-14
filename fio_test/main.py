@@ -24,7 +24,7 @@ while True:
 f.close()
 
 for i in logs:
-    data = f"{i[0]},{i[1]},{i[2]},{i[3]},{i[4]},{i[5]},{i[6]}"
+    data = f"{i[0]},{i[1]},{i[2]},{i[3]},{i[4]},{i[5]},{i[6]}\n"
     res.write(data)
 
 # rm_start = float(logs[-1][6])
