@@ -90,6 +90,7 @@ void main(int argc, char* argv[]) {
     }
     else {
         m2_start = get_time();
+        buffer = malloc(4096);
         while((ent = readdir(dir)) != NULL) {
             if(!strncmp(ent->d_name, ".", 1)) continue;
             strcat(filepath, argv[1]);
@@ -101,16 +102,14 @@ void main(int argc, char* argv[]) {
             size_single = lseek(fd_single, 0, SEEK_END);
             lseek(fd_single, 0, SEEK_SET);
             memset(filepath, 0, sizeof(char) * 255);
-            buffer = malloc(size_single);
             if((rc = read(fd_single, buffer, size_single)) < 0 ) {
                 perror("failed reading file");
                 return;
             }
+            memset(buffer, 0, 4096);
         }
         m2_end = get_time();
         printf("running time: %lf\n", m2_end - m2_start);
     }
-    
-    
     free(buffer);
 }
