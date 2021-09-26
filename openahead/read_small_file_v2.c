@@ -68,6 +68,7 @@ void main(int argc, char* argv[]) {
     seekdir(dir, SEEK_SET);
     char* filepath = malloc(sizeof(char) * 255);
     buffer = malloc(1024*16);
+    o_start = get_time();
     while((ent = readdir(dir)) != NULL) {
         if(!strncmp(ent->d_name, ".", 1)) continue;
         strcat(filepath, argv[1]);
