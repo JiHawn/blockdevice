@@ -34,16 +34,17 @@ int openahead(char* filepath) {
 void main(int argc, char* argv[]) {
     char* buffer;
     char* dirpath;
-    int rc, fd, size;
+    int rc, fd, size, mode;
     struct dirent *ent;
     double m2_start, m2_end;
     DIR *dir;
 
-    if(argc < 2) {
-        printf("input directory\n");
+    if(argc <= 2) {
+        printf("input directory and using openahead\n1: normal open\n2: openahead\n");
         return;
     }
     dirpath = argv[1];
+    mode = ((int)argv[2][0])-48;
     strcat(dirpath, "/");
     dir = opendir(dirpath);
     if (dir == NULL) {
@@ -61,7 +62,14 @@ void main(int argc, char* argv[]) {
         if(!strncmp(ent->d_name, ".", 1)) continue;
         strcat(filepath, argv[1]);
         strcat(filepath, ent->d_name);
-        fd = openahead(filepath);
+        if(mode == 1) {
+            if((fd=open(filepath, O_RDONLY)) < 0) {
+                perror("open failed");
+                exit(1);
+            }
+        } else {
+            fd = openahead(filepath);
+        }
         size = lseek(fd, 0, SEEK_END);
         lseek(fd, 0, SEEK_SET);
         memset(filepath, 0, sizeof(char) * 255);
