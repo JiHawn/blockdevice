@@ -35,23 +35,47 @@ void* prefetche(void* t) {
     off_t size[file_count];
     int* num = (int *)t;
     char* targetfile = malloc(sizeof(char) * 255);
+    struct dirent *ent;
+    DIR *dir;
     double start[file_count];
     double end[file_count];
     for(int i=0; i<file_count; i++) {
         fd[i] = -1;
     }
-    for(int i=0; i<file_count; i++) {
+
+    if((dir = opendir(dirpath)) == NULL) {
+        perror("failed open directory");
+        return;
+    }
+
+    int i = 0;
+    while((ent = readdir(dir)) != NULL) {
+        if(!strncmp(ent->d_name, ".", 1)) continue;
         if((i+1) % num_of_thread != *num) continue;
         strcat(targetfile, dirpath);
-        strcat(targetfile, file_list[i]);
+        strcat(targetfile, ent->d_name);
         if((fd[i] = open(targetfile, O_RDONLY)) < 0) {
             perror("failed file open");
             return NULL;
         }
-        size[i] = lseek(fd[i], 0, SEEK_END);
-        lseek(fd[i], 0, SEEK_SET);
         memset(targetfile, 0, sizeof(char) * 255);
+        i++;
     }
+    closedir(dir);
+
+
+    // for(int i=0; i<file_count; i++) {
+    //     if((i+1) % num_of_thread != *num) continue;
+    //     strcat(targetfile, dirpath);
+    //     strcat(targetfile, file_list[i]);
+    //     if((fd[i] = open(targetfile, O_RDONLY)) < 0) {
+    //         perror("failed file open");
+    //         return NULL;
+    //     }
+    //     size[i] = lseek(fd[i], 0, SEEK_END);
+    //     lseek(fd[i], 0, SEEK_SET);
+    //     memset(targetfile, 0, sizeof(char) * 255);
+    // }
 
 
     for(int i=0; i<file_count; i++) {
@@ -115,16 +139,16 @@ void main(int argc, char* argv[]) {
         if(!strncmp(ent->d_name, ".", 1)) continue;
         file_count++;
     }
-    seekdir(dir, SEEK_SET);
-    char* files[file_count];
-    i = 0;
-    while((ent = readdir(dir)) != NULL) {
-        if(!strncmp(ent->d_name, ".", 1)) continue;
-        files[i] = ent->d_name;
-        i++;
-    }
-    file_list = files;
-    
+    // seekdir(dir, SEEK_SET);
+    // char* files[file_count];
+    // i = 0;
+    // while((ent = readdir(dir)) != NULL) {
+    //     if(!strncmp(ent->d_name, ".", 1)) continue;
+    //     files[i] = ent->d_name;
+    //     i++;
+    // }
+    // file_list = files;
+    closedir(dir);
     pthread_t p_thread[num_of_thread];
     wd = inotify_add_watch(ifd, dirpath, IN_ACCESS);
     if(wd == -1) {
