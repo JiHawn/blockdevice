@@ -82,19 +82,10 @@ void* prefetche(void* t) {
 
     for(int i=0; i<file_count; i++) {
         if(fd[i] > 0) {
-            start[i] = get_time();
             if((res = posix_fadvise(fd[i], 0, size[i], POSIX_FADV_WILLNEED)) != 0) {
                 printf("fadvise error. error number: %d\n", res);
                 return NULL;
             }
-            end[i] = get_time();
-        }
-    }
-
-    for(int i=0; i<file_count; i++) {
-        if(fd[i] > 0) {
-            printf("%d,%lf,%lf\n", i, start[i], end[i]);
-            close(fd[i]);
         }
     }
 }
