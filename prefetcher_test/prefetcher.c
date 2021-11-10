@@ -45,7 +45,7 @@ void* prefetche(void* t) {
 
     if((dir = opendir(dirpath)) == NULL) {
         perror("failed open directory");
-        return;
+        return NULL;
     }
 
     int i = 0;
@@ -58,6 +58,8 @@ void* prefetche(void* t) {
             perror("failed file open");
             return NULL;
         }
+        size[i] = lseek(fd[i], 0, SEEK_END);
+        lseek(fd[i], 0, SEEK_SET);
         memset(targetfile, 0, sizeof(char) * 255);
         i++;
     }
