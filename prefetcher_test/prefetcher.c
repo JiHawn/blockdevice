@@ -51,7 +51,10 @@ void* prefetche(void* t) {
     int i = 0;
     while((ent = readdir(dir)) != NULL) {
         if(!strncmp(ent->d_name, ".", 1)) continue;
-        if((i+1) % num_of_thread != *num) continue;
+        if((i+1) % num_of_thread != *num) {
+            i++;
+            continue;
+        }
         strcat(targetfile, dirpath);
         strcat(targetfile, ent->d_name);
         if((fd[i] = open(targetfile, O_RDONLY)) < 0) {
