@@ -13,7 +13,6 @@ char* dirpath;
 char** file_list;
 int num_of_thread;
 int file_count = 0;
-int app_start;
 
 double get_time() {
     double ms;
@@ -135,6 +134,7 @@ void* prefetche(void* t) {
 void main(int argc, char* argv[]) {
     DIR* dir;
     struct dirent* ent;
+    double start, end;
     int i = 1;
     while(argv[i]) {
         if(argv[i][0] == '-') {
@@ -169,7 +169,7 @@ void main(int argc, char* argv[]) {
     pthread_t p_thread[num_of_thread];
     pthread_t r_thread[num_of_thread];
     int args[num_of_thread];
-    app_start = get_time();
+    start = get_time();
     for(int i=0; i<num_of_thread; i++) {
         args[i] = i;
         int thr;
@@ -177,6 +177,11 @@ void main(int argc, char* argv[]) {
             perror("thread create error:");
             exit(0);
         }
+    }
+    
+    for(int i=0; i<num_of_thread; i++) {
+        args[i] = i;
+        int thr;
         if((thr = pthread_create(&r_thread[i], NULL, multiRead, (void *)&args[i])) < 0) {
             perror("thread create error:");
             exit(0);
@@ -189,4 +194,6 @@ void main(int argc, char* argv[]) {
     for(int i=0; i<num_of_thread; i++) {
         pthread_join(r_thread[i], NULL);
     }
+    end = get_time();
+    printf("running  time: %ld\n", end - start);
 }
