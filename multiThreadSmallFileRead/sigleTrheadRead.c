@@ -189,7 +189,7 @@ void main(int argc, char* argv[]) {
         strcat(targetfile, ent->d_name);
         if((fd[i] = open(targetfile, O_RDONLY)) < 0) {
             perror("failed file open");
-            return NULL;
+            return;
         }
         size[i] = lseek(fd[i], 0, SEEK_END);
         lseek(fd[i], 0, SEEK_SET);
@@ -202,7 +202,7 @@ void main(int argc, char* argv[]) {
         char *buffer = malloc(size[i]);
         if((rd = read(fd[i], buffer, size[i])) < 0) {
             perror("multiRead read error");
-            return NULL;
+            return;
         }
     }
 
