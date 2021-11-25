@@ -132,7 +132,6 @@ void* prefetche(void *p) {
     while((ent = readdir(dir)) != NULL) {
         if(!strncmp(ent->d_name, ".",1)) continue;
         if((i+1) % numOfPair != num) {
-            i++;
             continue;
         }
         strcpy(filename, ent->d_name);
