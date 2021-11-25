@@ -68,9 +68,11 @@ void* copy(void* p) {
     destFilename = destFilepath + destLength;
 
     int i = 0;
+    int j = 0;
     while((ent = readdir(srcDir)) != NULL) {
         if(!strncmp(ent->d_name, ".", 1)) continue;
-        if((i+1) % numOfPair != num) {
+        if((j+1) % numOfPair != num) {
+            j++;
             continue;
         }
         strcpy(srcFilename, ent->d_name);
@@ -86,6 +88,7 @@ void* copy(void* p) {
         size[i] = lseek(srcFd[i], 0, SEEK_END);
         lseek(srcFd[i], 0, SEEK_SET);
         i++;
+        j++;
     }
 
     for(int i=0; i<numOfFile/numOfPair+1; i++) {

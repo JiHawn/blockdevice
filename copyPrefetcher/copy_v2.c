@@ -128,10 +128,12 @@ void* prefetche(void *p) {
     strcat(filepath, "/");
     filename = filepath + strlen(path) + 1;
 
-    int i=0;
+    int i = 0;
+    int j = 0;
     while((ent = readdir(dir)) != NULL) {
         if(!strncmp(ent->d_name, ".",1)) continue;
-        if((i+1) % numOfPair != num) {
+        if((j+1) % numOfPair != num) {
+            j++;
             continue;
         }
         strcpy(filename, ent->d_name);
@@ -142,6 +144,7 @@ void* prefetche(void *p) {
         size[i] = lseek(fd[i], 0, SEEK_END);
         lseek(fd[i], 0, SEEK_SET);
         i++;
+        j++;
     }
     
     for(int i=0; i<numOfFile/numOfPair+1; i++) {
