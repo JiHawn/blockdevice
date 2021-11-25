@@ -13,13 +13,15 @@
 #define FILE_SIZE_MAX 5000
 
 int extern errno;
-int copyLock = 0;
-int prefetcheLock = 0;
+int *copyLock;
+int *prefetcheLock;
 int ioLimit = INT_MAX;
+int numOfPair;
 
 struct src_dest {
     char* src;
     char* dest;
+    int num;
 };
 
 void* copy(void* p) {
@@ -32,6 +34,7 @@ void* copy(void* p) {
     struct src_dest *sd = (struct src_dest *)p;
     char *src = sd->src;
     char *dest = sd->dest;
+    int num = sd->num;
     struct dirent *ent;
     int res;
     int srcLength, destLength;
@@ -57,9 +60,14 @@ void* copy(void* p) {
     destLength = strlen(dest) + 1;
     destFilename = destFilepath + destLength;
 
+    int i = 0;
     while((ent = readdir(srcDir)) != NULL) {
         if(!strncmp(ent->d_name, ".", 1)) continue;
-        while(copyLock) {;}
+        if((i+1) % numOfPair != num) {
+            i++;
+            continue;
+        }
+        while(copyLock[num]) {;}
         strcpy(srcFilename, ent->d_name);
         strcpy(destFilename, ent->d_name);
         if((srcFd = open(srcFilepath, O_RDONLY)) < 0) {
@@ -84,12 +92,13 @@ void* copy(void* p) {
         close(destFd);
         ioNum++;
         if(ioNum == ioLimit) {
-            copyLock = 1;
-            prefetcheLock = 0;
+            copyLock[num] = 1;
+            prefetcheLock[num] = 0;
             ioNum = 0;
         }
+        i++;
     }
-    prefetcheLock = 0;
+    prefetcheLock[num] = 0;
 }
 
 void* prefetche(void *p) {
@@ -103,6 +112,7 @@ void* prefetche(void *p) {
     int ioNum = 0;
     struct src_dest *sd = (struct src_dest *)p;
     char* path = sd->src;
+    int num = sd->num;
 
     if((dir = opendir(path)) == NULL) {
         perror("failed open directory");
@@ -112,9 +122,14 @@ void* prefetche(void *p) {
     strcat(filepath, "/");
     filename = filepath + strlen(path) + 1;
     
+    int i=0;
     while((ent = readdir(dir)) != NULL) {
         if(!strncmp(ent->d_name, ".", 1)) continue;
-        while(prefetcheLock) {;}
+        if((i+1) % numOfPair != num) {
+            i++;
+            continue;
+        }
+        while(prefetcheLock[num]) {;}
         strcpy(filename, ent->d_name);
         if((fd = open(filepath, O_RDONLY)) < 0) {
             perror("file open");
@@ -129,38 +144,54 @@ void* prefetche(void *p) {
         close(fd);
         ioNum++;
         if(ioNum == ioLimit) {
-            prefetcheLock = 1;
-            copyLock = 0;
+            prefetcheLock[num] = 1;
+            copyLock[num] = 0;
             ioNum = 0;
         }
+        i++;
     }
-    copyLock = 0;
+    copyLock[num] = 0;
 }
 
 int main(int argc, char* argv[]) {
-    struct src_dest *args;
-    pthread_t cpThread;
-    pthread_t prThread;
+    if(argc < 4) {
+        printf("input error: %s [src] [dest] [numOfPair] [ioNum] <- option\n", argv[0]);
+        exit(1);
+    }
+    numOfPair = atoi(argv[3]);
+    if(argc == 5) ioLimit = atoi(argv[4]);
+
+    int cpLock[numOfPair];
+    int prLock[numOfPair];
+    for(int i=0; i<numOfPair; i++) {
+        cpLock[i] = 0;
+        prLock[i] = 0;
+    }
+    copyLock = cpLock;
+    prefetcheLock = prLock;
+    struct src_dest args[numOfPair];
+    pthread_t cpThread[numOfPair];
+    pthread_t prThread[numOfPair];
     int thr;
 
-    if(argc < 3) {
-        printf("input error: %s [src] [dest] [ioNum] <- option\n", argv[0]);
-        exit(1);
-    }
-    args->src = argv[1];
-    args->dest = argv[2];
-    if(argc == 4) ioLimit = atoi(argv[3]);
+    for(int i=0; i<numOfPair; i++) {
+        args[i].src = argv[1];
+        args[i].dest = argv[2];
+        args[i].num = i;
+        
+        if((thr = pthread_create(&prThread[i], NULL, prefetche, (void *)&args[i])) <0) {
+            perror("prefetcher thread create error");
+            exit(1);
+        }
 
-    if((thr = pthread_create(&prThread, NULL, prefetche, (void *)args)) <0) {
-        perror("prefetcher thread create error");
-        exit(1);
+        if((thr = pthread_create(&cpThread[i], NULL, copy, (void *)&args[i])) <0) {
+            perror("copy thread create error");
+            exit(1);
+        }
     }
-
-    if((thr = pthread_create(&cpThread, NULL, copy, (void *)args)) <0) {
-        perror("copy thread create error");
-        exit(1);
+    
+    for(int i=0; i<numOfPair; i++) {
+        pthread_join(prThread[i], NULL);
+        pthread_join(cpThread[i], NULL);
     }
-
-    pthread_join(prThread, NULL);
-    pthread_join(cpThread, NULL);
 }
