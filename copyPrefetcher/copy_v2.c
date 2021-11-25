@@ -142,6 +142,7 @@ void* prefetche(void *p) {
         }
         size[i] = lseek(fd[i], 0, SEEK_END);
         lseek(fd[i], 0, SEEK_SET);
+        i++;
     }
     
     for(int i=0; i<numOfFile/numOfPair+1; i++) {
