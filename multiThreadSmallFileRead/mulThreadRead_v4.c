@@ -142,12 +142,7 @@ void main(int argc, char* argv[]) {
         perror("failed open directory");
         return;
     }
-    while((ent = readdir(dir)) != NULL) {
-        if(!strncmp(ent->d_name, ".", 1)) continue;
-        file_count++;
-    }
-    closedir(dir);
-
+    
     pthread_t p_thread[num_of_thread];
     pthread_t r_thread[num_of_thread];
     int args[num_of_thread];
