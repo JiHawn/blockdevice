@@ -1,29 +1,15 @@
-#define _GNU_SOURCE
 #include <stdio.h>
-#include <sys/inotify.h>
 #include <unistd.h>
 #include <dirent.h>
 #include <string.h>
 #include <fcntl.h>
 #include <stdlib.h>
-#include <time.h>
 #include <pthread.h>
 
 char* dirpath;
 char** file_list;
 int num_of_thread;
 int file_count = 0;
-
-double get_time() {
-    double ms;
-    int s;
-    struct timespec spec;
-
-    clock_gettime(CLOCK_REALTIME, &spec);
-    s = spec.tv_sec;
-    ms = spec.tv_nsec / 10e8;
-    return s + ms;
-}
 
 void* multiRead(void* t) {
     int fd;
@@ -135,12 +121,6 @@ void main(int argc, char* argv[]) {
             printf("input options (-f, -t)\n");
         }
         i += 2;
-    }
-
-    strcat(dirpath, "/");
-    if((dir = opendir(dirpath)) == NULL) {
-        perror("failed open directory");
-        return;
     }
 
     pthread_t p_thread[num_of_thread];
