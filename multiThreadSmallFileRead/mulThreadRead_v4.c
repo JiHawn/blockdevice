@@ -126,7 +126,6 @@ void main(int argc, char* argv[]) {
     pthread_t p_thread[num_of_thread];
     pthread_t r_thread[num_of_thread];
     int args[num_of_thread];
-    start = get_time();
     for(int i=0; i<num_of_thread; i++) {
         args[i] = i;
         int thr;
