@@ -190,5 +190,5 @@ void main(int argc, char* argv[]) {
         pthread_join(r_thread[i], NULL);
     }
     end = get_time();
-    printf("running  time: %ld\n", end - start);
+    printf("running  time: %f\n", end - start);
 }
