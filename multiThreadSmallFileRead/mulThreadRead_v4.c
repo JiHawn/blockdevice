@@ -142,7 +142,7 @@ void main(int argc, char* argv[]) {
         perror("failed open directory");
         return;
     }
-    
+
     pthread_t p_thread[num_of_thread];
     pthread_t r_thread[num_of_thread];
     int args[num_of_thread];
@@ -162,10 +162,6 @@ void main(int argc, char* argv[]) {
 
     for(int i=0; i<num_of_thread; i++) {
         pthread_join(p_thread[i], NULL);
-    }
-    for(int i=0; i<num_of_thread; i++) {
         pthread_join(r_thread[i], NULL);
     }
-    end = get_time();
-    printf("running  time: %f\n", end - start);
 }
