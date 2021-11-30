@@ -29,7 +29,7 @@ void main(int argc, char* argv[]) {
     DIR *dir;
 
     if(argc <= 2) {
-        printf("input directory and mode(1 or 2)\nmeod 1: open->read->open->read\nmode 2: open->open->read->read\n");
+        printf("input directory and mode(1 or 2)\nmeod 1: open->open->read->read\nmode 2: open->read->open->read\n");
         return;
     }
     dirpath = argv[1];
